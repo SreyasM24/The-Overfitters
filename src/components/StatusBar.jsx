@@ -15,7 +15,7 @@ export default function StatusBar({ prediction, isLoading }) {
         display: 'flex',
         flexDirection: 'column',
         gap: '40px', // Increased gap between heading and table
-        width: '580px', // Increased table container width significantly
+        width: '480px', 
       }}
     >
       {/* ── Title block ── */}
@@ -71,12 +71,9 @@ export default function StatusBar({ prediction, isLoading }) {
           style={{
             display: 'grid',
             gridTemplateColumns: '1.2fr 1fr 1fr',
-            gap: '28px 16px', // Increased gap between rows and columns
-            background: 'rgba(5, 15, 30, 0.5)',
-            border: '1px solid rgba(0, 150, 255, 0.2)',
-            borderRadius: '16px',
-            padding: '36px', // Increased inner padding
-            backdropFilter: 'blur(12px)',
+            gap: '28px 16px', // Keep the wide spacing
+            width: '480px', // Reduced from 580px so it doesn't hit the globe
+            // Background, border, and blur completely removed to let it float in space
           }}
         >
           {/* Headers */}
