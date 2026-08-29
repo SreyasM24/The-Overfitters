@@ -3,7 +3,7 @@
 **SIH 2026 — Space Technology**
 **Team: The Overfitters**
 
-## 📌 Overview
+## Overview
 
 This project presents an **AI-based GNSS Satellite Error Prediction System** that forecasts satellite orbit and clock errors up to **2 hours in advance**.
 
@@ -11,21 +11,21 @@ Instead of waiting for satellite errors to occur and then correcting them, our s
 
 The system predicts four major error components:
 
-* **X-axis Position Error**
-* **Y-axis Position Error**
-* **Z-axis Position Error**
-* **Satellite Clock Error**
+* X-axis Position Error
+* Y-axis Position Error
+* Z-axis Position Error
+* Satellite Clock Error
 
 The trained models are optimized and deployed on a **Raspberry Pi**, enabling lightweight **edge-based inference**.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 * AI-based GNSS satellite error forecasting
-* Up to **2-hour ahead prediction**
-* Uses **48 historical observations**
-* **68 engineered features**
+* Up to 2-hour ahead prediction
+* Uses 48 historical observations
+* 68 engineered features
 * Multi-output prediction of X, Y, Z and clock errors
 * GRU and LSTM model comparison
 * Chronological time-series validation
@@ -38,7 +38,7 @@ The trained models are optimized and deployed on a **Raspberry Pi**, enabling li
 
 ---
 
-## 🧠 Problem Statement
+## Problem Statement
 
 GNSS positioning accuracy depends heavily on the accuracy of satellite orbit and clock information.
 
@@ -46,15 +46,15 @@ Even small satellite position or clock errors can propagate into the final posit
 
 Traditional approaches generally identify and correct errors after they occur.
 
-### Our approach
+### Our Approach
 
-> **Instead of waiting for satellite errors to occur, we forecast them in advance.**
+> Instead of waiting for satellite errors to occur, we forecast them in advance.
 
 The system learns historical temporal patterns and predicts future satellite errors, enabling a shift from **reactive error correction to predictive error management**.
 
 ---
 
-## 🔄 System Workflow
+## System Workflow
 
 ```text
 GNSS / Reference Data
@@ -84,7 +84,7 @@ Feature Engineering
 
 ---
 
-# 🤖 Machine Learning Pipeline
+# Machine Learning Pipeline
 
 ## Input
 
@@ -100,7 +100,7 @@ The 68 features contain information describing satellite state, orbital behaviou
 
 ---
 
-## 🎯 Prediction Targets
+## Prediction Targets
 
 The model performs multi-output prediction for:
 
@@ -119,7 +119,7 @@ The prediction horizon is approximately:
 
 ---
 
-# 🛠️ Feature Engineering
+# Feature Engineering
 
 Feature engineering is one of the important components of the system.
 
@@ -152,13 +152,13 @@ X_error_rolling_std_6
 
 Similar temporal and statistical features are generated for the other prediction variables.
 
-### Key idea
+### Key Idea
 
-> **We don't just tell the model where the error is — we tell it how the error is moving.**
+> We don't just tell the model where the error is — we tell it how the error is moving.
 
 ---
 
-# 🧠 Model Architecture
+# Model Architecture
 
 We evaluated two recurrent neural network architectures:
 
@@ -201,7 +201,7 @@ Clock Error
 
 ---
 
-# 📊 Dataset
+# Dataset
 
 The prepared dataset contains approximately:
 
@@ -218,7 +218,7 @@ The system can work with GNSS observations, broadcast navigation/ephemeris infor
 
 ---
 
-# ⏱️ Time-Series Validation
+# Time-Series Validation
 
 Since this is a forecasting problem, randomly mixing past and future observations can cause **data leakage**.
 
@@ -238,7 +238,7 @@ This better represents the real-world forecasting scenario where the model only 
 
 ---
 
-# ⚡ Edge Deployment
+# Edge Deployment
 
 After training, the models are exported to **ONNX** format.
 
@@ -258,7 +258,7 @@ The INT8 models are designed for efficient inference on the Raspberry Pi.
 
 ---
 
-# 🍓 Raspberry Pi Deployment
+# Raspberry Pi Deployment
 
 The Raspberry Pi acts as the **edge inference device**.
 
@@ -288,7 +288,7 @@ This means the ML model does not need to run on a powerful cloud GPU for every p
 
 ---
 
-# 🔌 FastAPI Backend
+# FastAPI Backend
 
 The backend is implemented using **FastAPI**.
 
@@ -305,7 +305,7 @@ The backend is responsible for:
 
 ---
 
-# 📡 API Example
+# API Example
 
 Example prediction request:
 
@@ -325,7 +325,7 @@ with the IP address of your Raspberry Pi.
 
 ---
 
-# 📥 Example Response
+# Example Response
 
 The API can return predictions from both models:
 
@@ -351,7 +351,7 @@ The exact response structure depends on the implementation of the deployed FastA
 
 ---
 
-# ❤️ Health Check
+# Health Check
 
 The backend can expose a health endpoint to verify that the Raspberry Pi server is running.
 
@@ -370,7 +370,7 @@ Example response:
 
 ---
 
-# 📈 Model Evaluation
+# Model Evaluation
 
 When actual observations are available, predicted values are compared with ground-truth values.
 
@@ -400,7 +400,7 @@ Lower RMSE indicates better performance.
 
 ---
 
-# 📁 Project Structure
+# Project Structure
 
 A typical project structure is:
 
@@ -430,7 +430,7 @@ GNSS-Satellite-Error-Prediction/
 
 ---
 
-# ⚙️ Installation
+# Installation
 
 ## 1. Clone the Repository
 
@@ -467,7 +467,7 @@ pip install -r requirements.txt
 
 ---
 
-# ▶️ Running the Backend
+# Running the Backend
 
 Start the FastAPI server using:
 
@@ -489,7 +489,7 @@ http://localhost:8000/docs
 
 ---
 
-# 💻 Running the Frontend
+# Running the Frontend
 
 Navigate to the frontend directory:
 
@@ -522,7 +522,7 @@ The frontend communicates with the FastAPI backend and displays:
 
 ---
 
-# 🍓 Raspberry Pi Setup
+# Raspberry Pi Setup
 
 On the Raspberry Pi:
 
@@ -554,7 +554,7 @@ The Raspberry Pi can now receive prediction requests from the frontend/backend o
 
 ---
 
-# 🌐 Frontend → Backend → Raspberry Pi
+# Frontend to Backend to Raspberry Pi
 
 The complete communication flow is:
 
@@ -591,7 +591,7 @@ The complete communication flow is:
 
 ---
 
-# 💡 Innovation
+# Innovation
 
 The innovation of the project is not simply using a GRU or LSTM.
 
@@ -614,7 +614,7 @@ The result is an **end-to-end predictive satellite error forecasting pipeline**.
 
 ---
 
-# 🌍 Applications
+# Applications
 
 The proposed system can support applications such as:
 
@@ -630,7 +630,7 @@ The proposed system can support applications such as:
 
 ---
 
-# 🔮 Future Scope
+# Future Scope
 
 Future improvements can include:
 
@@ -648,7 +648,7 @@ Future improvements can include:
 
 ---
 
-# 🏆 Key Takeaway
+# Key Takeaway
 
 Traditional systems primarily **detect and correct** satellite errors.
 
@@ -668,7 +668,7 @@ ACT EARLY
 
 ---
 
-# 👥 Team
+# Team
 
 ### The Overfitters
 
@@ -678,7 +678,7 @@ ACT EARLY
 
 ---
 
-## 📜 Disclaimer
+## Disclaimer
 
 This project is a prototype developed for **Smart India Hackathon 2026**.
 
