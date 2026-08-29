@@ -1,215 +1,335 @@
-AI-Based GNSS Satellite Error Prediction
+# AI-Based GNSS Satellite Error Prediction
 
-SIH 2026 --- Space Technology | Problem Statement 25176
-Team: The Overfitters
+**SIH 2026 — Space Technology**
+**Team: The Overfitters**
 
-Overview
+## 📌 Overview
 
-This project is an AI-based system for forecasting GNSS satellite
-orbit and clock errors up to two hours in advance.
+This project presents an **AI-based GNSS Satellite Error Prediction System** that forecasts satellite orbit and clock errors up to **2 hours in advance**.
 
-Instead of waiting for satellite errors to occur and then correcting
-them, the system learns temporal patterns from historical GNSS data and
-predicts future errors. The prediction pipeline is designed to run on a
-Raspberry Pi, making the solution suitable for lightweight edge
-deployment.
+Instead of waiting for satellite errors to occur and then correcting them, our system learns temporal patterns from historical GNSS data and predicts future errors.
 
-The system predicts four error components:
+The system predicts four major error components:
 
-X-axis position error
+* **X-axis Position Error**
+* **Y-axis Position Error**
+* **Z-axis Position Error**
+* **Satellite Clock Error**
 
-Y-axis position error
+The trained models are optimized and deployed on a **Raspberry Pi**, enabling lightweight **edge-based inference**.
 
-Z-axis position error
+---
 
-Satellite clock error
+## 🚀 Key Features
 
-Key Features
+* AI-based GNSS satellite error forecasting
+* Up to **2-hour ahead prediction**
+* Uses **48 historical observations**
+* **68 engineered features**
+* Multi-output prediction of X, Y, Z and clock errors
+* GRU and LSTM model comparison
+* Chronological time-series validation
+* ONNX model conversion
+* INT8 model optimization
+* Raspberry Pi edge deployment
+* FastAPI-based backend
+* Web-based visualization dashboard
+* MAE and RMSE based evaluation
 
-GNSS satellite error forecasting using deep learning
+---
 
-48-step historical sequence input
+## 🧠 Problem Statement
 
-68 engineered input features
+GNSS positioning accuracy depends heavily on the accuracy of satellite orbit and clock information.
 
-Multi-output prediction of X, Y, Z and clock errors
+Even small satellite position or clock errors can propagate into the final positioning solution.
 
-Comparison of GRU and LSTM architectures
+Traditional approaches generally identify and correct errors after they occur.
 
-Chronological train/validation/test methodology
+### Our approach
 
-ONNX model export
+> **Instead of waiting for satellite errors to occur, we forecast them in advance.**
 
-INT8 model optimization for edge inference
+The system learns historical temporal patterns and predicts future satellite errors, enabling a shift from **reactive error correction to predictive error management**.
 
-Raspberry Pi deployment
+---
 
-FastAPI backend for prediction requests
+## 🔄 System Workflow
 
-Web dashboard for visualization
-
-Ground-truth comparison using MAE and RMSE when actual observations
-are available
-
-System Workflow
-
+```text
 GNSS / Reference Data
         ↓
 Data Cleaning & Preparation
         ↓
 Feature Engineering
         ↓
-68 Features
+68 Engineered Features
         ↓
-48-Step Temporal Sequence
+48-Step Historical Sequence
         ↓
      GRU / LSTM
         ↓
-  2-Hour Forecast
+  2-Hour Error Forecast
         ↓
-   ONNX / INT8
+     ONNX / INT8
         ↓
-   Raspberry Pi
+    Raspberry Pi
         ↓
-    FastAPI API
+      FastAPI
         ↓
    Web Dashboard
         ↓
-Prediction + Evaluation
+ Prediction + Evaluation
+```
 
-Machine Learning Pipeline
+---
 
-Input
+# 🤖 Machine Learning Pipeline
 
-The model uses a chronological window of 48 observations with 68
-features per observation.
+## Input
 
-Feature engineering captures:
+The model receives a historical sequence consisting of:
 
-Satellite orbital parameters
+```text
+48 observations × 68 features
+```
 
-Satellite clock parameters
+The 48 observations provide the model with historical temporal information about the satellite.
 
-Temporal information
+The 68 features contain information describing satellite state, orbital behaviour, clock behaviour and temporal changes.
 
-First-order changes
+---
 
-Second-order changes
+## 🎯 Prediction Targets
 
-Rates of change
+The model performs multi-output prediction for:
 
-Rolling statistics
+```text
+X Position Error
+Y Position Error
+Z Position Error
+Satellite Clock Error
+```
 
-Historical satellite error behaviour
+The prediction horizon is approximately:
 
-The objective is to represent not only the current satellite state, but
-also how that state is changing over time.
+```text
+2 Hours
+```
 
-Output
+---
 
-The model simultaneously predicts:
+# 🛠️ Feature Engineering
 
+Feature engineering is one of the important components of the system.
+
+Instead of providing only the current satellite error to the model, we create features that describe **how the satellite's behaviour is changing over time**.
+
+The feature set includes:
+
+* Orbital parameters
+* Satellite clock parameters
+* Temporal features
+* First-order differences
+* Second-order differences
+* Rates of change
+* Rolling means
+* Rolling standard deviations
+* Historical error information
+
+For example:
+
+```text
+X_error
+d_X
+dd_X
+d_X_dt
+X_error_rolling_mean_3
+X_error_rolling_std_3
+X_error_rolling_mean_6
+X_error_rolling_std_6
+```
+
+Similar temporal and statistical features are generated for the other prediction variables.
+
+### Key idea
+
+> **We don't just tell the model where the error is — we tell it how the error is moving.**
+
+---
+
+# 🧠 Model Architecture
+
+We evaluated two recurrent neural network architectures:
+
+## GRU — Gated Recurrent Unit
+
+GRU is a recurrent neural network designed for sequential data.
+
+It is relatively lightweight while still being capable of learning temporal dependencies.
+
+This makes GRU particularly suitable for **edge deployment on resource-constrained devices such as Raspberry Pi**.
+
+---
+
+## LSTM — Long Short-Term Memory
+
+LSTM is another recurrent neural network architecture designed to learn long-term dependencies in sequential data.
+
+It was used as a comparison model against GRU.
+
+---
+
+## Model Input and Output
+
+```text
+Input:
+48 × 68
+
+        ↓
+
+   GRU / LSTM
+
+        ↓
+
+Output:
 X Error
 Y Error
 Z Error
 Clock Error
+```
 
-for approximately a 2-hour prediction horizon.
+---
 
-Models
+# 📊 Dataset
 
-Two recurrent neural network architectures are evaluated:
+The prepared dataset contains approximately:
 
-GRU
+| Property           |   Value |
+| ------------------ | ------: |
+| Observations       |   2,909 |
+| Satellites         |      31 |
+| Features           |      68 |
+| Sequence Length    |      48 |
+| Prediction Targets |       4 |
+| Forecast Horizon   | 2 Hours |
 
-The Gated Recurrent Unit is used to learn temporal dependencies while
-keeping the model relatively lightweight, which is useful for edge
-deployment.
+The system can work with GNSS observations, broadcast navigation/ephemeris information, satellite clock information and precise reference products.
 
-LSTM
+---
 
-The Long Short-Term Memory network is used as a comparison architecture
-for learning longer-term temporal dependencies.
+# ⏱️ Time-Series Validation
 
-The selected model is exported to ONNX and optimized for Raspberry Pi
-inference.
+Since this is a forecasting problem, randomly mixing past and future observations can cause **data leakage**.
 
-Dataset
+Therefore, the project uses chronological splitting.
 
-The prepared project dataset contains approximately:
+```text
+Past Data
+   ↓
+Training
+   ↓
+Validation
+   ↓
+Future Test Data
+```
 
-Property                  Value
+This better represents the real-world forecasting scenario where the model only has access to past information when predicting the future.
 
-Observations              2,909
-Satellites                   31
-Engineered features          68
-Sequence length              48
-Prediction targets            4
-Forecast horizon        2 hours
+---
 
-The project can incorporate GNSS observations, broadcast
-navigation/ephemeris information, satellite clock data, and precise
-reference products such as SP3 orbit and CLK clock products.
+# ⚡ Edge Deployment
 
-Edge Deployment
+After training, the models are exported to **ONNX** format.
 
-The trained model is converted to ONNX and an INT8 optimized
-version is used for lightweight inference.
+The models are then optimized using **INT8 quantization** for lightweight inference.
 
-The Raspberry Pi acts as the inference device:
+Example model files:
 
-Client / Frontend
-       ↓
-FastAPI Request
-       ↓
-Raspberry Pi
-       ↓
-Load Sequence
-       ↓
-ONNX Runtime
-       ↓
-GRU / LSTM Inference
-       ↓
-Predicted X/Y/Z/Clock Errors
-       ↓
-FastAPI Response
-       ↓
+```text
+models/
+├── GRU_FP32.onnx
+├── GRU_INT8.onnx
+├── LSTM_FP32.onnx
+└── LSTM_INT8.onnx
+```
+
+The INT8 models are designed for efficient inference on the Raspberry Pi.
+
+---
+
+# 🍓 Raspberry Pi Deployment
+
+The Raspberry Pi acts as the **edge inference device**.
+
+The complete process is:
+
+```text
 Frontend
+    ↓
+FastAPI Request
+    ↓
+Raspberry Pi
+    ↓
+Historical Sequence
+    ↓
+ONNX Runtime
+    ↓
+GRU / LSTM
+    ↓
+Prediction
+    ↓
+FastAPI Response
+    ↓
+Frontend
+```
 
-This allows the machine-learning inference to happen locally on the edge
-device rather than requiring a cloud GPU/server for every prediction.
+This means the ML model does not need to run on a powerful cloud GPU for every prediction.
 
-Backend
+---
 
-The backend is built using FastAPI.
+# 🔌 FastAPI Backend
 
-The API is responsible for:
+The backend is implemented using **FastAPI**.
 
-Receiving prediction parameters.
+The backend is responsible for:
 
-Preparing the required historical sequence.
+1. Receiving prediction requests.
+2. Identifying the requested satellite and prediction time.
+3. Preparing the required historical sequence.
+4. Loading the deployed model.
+5. Running inference on the Raspberry Pi.
+6. Returning X, Y, Z and clock predictions.
+7. Comparing GRU and LSTM predictions when required.
+8. Providing evaluation metrics when ground truth is available.
 
-Loading the deployed model.
+---
 
-Running inference on the Raspberry Pi.
+# 📡 API Example
 
-Returning the predicted error values.
+Example prediction request:
 
-Providing model comparison and evaluation results when applicable.
-
-Example request:
-
+```bash
 curl -X POST http://<RASPBERRY_PI_IP>:8000/compare \
 -H "Content-Type: application/json" \
 -d '{"satellite":7,"prediction_date":"2025-04-30","prediction_time":"00:00"}'
+```
 
-Replace <RASPBERRY_PI_IP> with the IP address of the Raspberry Pi.
+Replace:
 
-Example Prediction Response
+```text
+<RASPBERRY_PI_IP>
+```
 
-The API returns predictions for both model variants when comparison mode
-is used:
+with the IP address of your Raspberry Pi.
 
+---
+
+# 📥 Example Response
+
+The API can return predictions from both models:
+
+```json
 {
   "GRU_INT8": {
     "X_error": 0.0,
@@ -225,35 +345,68 @@ is used:
   },
   "forecast_horizon_hours": 2.0
 }
+```
 
-The exact response fields depend on the deployed API implementation.
+The exact response structure depends on the implementation of the deployed FastAPI service.
 
-Model Evaluation
+---
 
-When ground-truth observations are available, predictions can be
-compared with actual values using:
+# ❤️ Health Check
 
-MAE
+The backend can expose a health endpoint to verify that the Raspberry Pi server is running.
 
-Mean Absolute Error measures the average absolute difference between
-predicted and actual values.
+```bash
+curl http://<RASPBERRY_PI_IP>:8000/health
+```
 
-MAE = average(|actual - predicted|)
+Example response:
 
-RMSE
+```json
+{
+  "status": "online",
+  "device": "Raspberry Pi"
+}
+```
 
-Root Mean Squared Error gives greater weight to larger prediction
-errors.
+---
 
-RMSE = sqrt(average((actual - predicted)^2))
+# 📈 Model Evaluation
 
-These metrics are used to evaluate and compare the GRU and LSTM models.
+When actual observations are available, predicted values are compared with ground-truth values.
 
-Project Structure
+Two important evaluation metrics are used.
 
-A typical project organization is:
+## MAE — Mean Absolute Error
 
-project/
+MAE measures the average absolute difference between actual and predicted values.
+
+```text
+MAE = average(|Actual - Predicted|)
+```
+
+Lower MAE indicates better prediction accuracy.
+
+---
+
+## RMSE — Root Mean Squared Error
+
+RMSE measures prediction error while giving greater importance to larger errors.
+
+```text
+RMSE = √average((Actual - Predicted)²)
+```
+
+Lower RMSE indicates better performance.
+
+---
+
+# 📁 Project Structure
+
+A typical project structure is:
+
+```text
+GNSS-Satellite-Error-Prediction/
+│
 ├── frontend/
 │   └── ...
 │
@@ -273,161 +426,260 @@ project/
 ├── feature_order.json
 ├── requirements.txt
 └── README.md
+```
 
-Adjust the folder and filename entries above to match the final
-repository structure.
+---
 
-Running the Backend
+# ⚙️ Installation
 
-Create and activate a Python environment:
+## 1. Clone the Repository
 
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd <YOUR_PROJECT_DIRECTORY>
+```
+
+---
+
+## 2. Create Virtual Environment
+
+### Windows
+
+```bash
 python -m venv venv
-
-Windows:
-
 venv\Scripts\activate
+```
 
-Linux/macOS/Raspberry Pi:
+### Linux / Raspberry Pi
 
+```bash
+python3 -m venv venv
 source venv/bin/activate
+```
+
+---
+
+## 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# ▶️ Running the Backend
+
+Start the FastAPI server using:
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+The backend will be available at:
+
+```text
+http://localhost:8000
+```
+
+FastAPI documentation:
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+# 💻 Running the Frontend
+
+Navigate to the frontend directory:
+
+```bash
+cd frontend
+```
 
 Install dependencies:
 
-pip install -r requirements.txt
-
-Start FastAPI:
-
-uvicorn main:app --host 0.0.0.0 --port 8000
-
-The API should then be available at:
-
-http://localhost:8000
-
-FastAPI's interactive documentation is normally available at:
-
-http://localhost:8000/docs
-
-Running the Frontend
-
-From the frontend directory:
-
+```bash
 npm install
+```
+
+Start the development server:
+
+```bash
 npm run dev
+```
 
-The frontend communicates with the FastAPI backend to request
-predictions and display the results.
+The frontend communicates with the FastAPI backend and displays:
 
-Make sure the frontend API configuration points to the correct
-backend/Raspberry Pi address.
+* Satellite information
+* Predicted errors
+* GRU predictions
+* LSTM predictions
+* Actual values
+* MAE
+* RMSE
+* Prediction horizon
 
-Raspberry Pi Deployment
+---
+
+# 🍓 Raspberry Pi Setup
 
 On the Raspberry Pi:
 
-git clone <YOUR_REPOSITORY_URL>
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
 cd <YOUR_PROJECT_DIRECTORY>
+```
 
-Create the Python environment and install the backend dependencies:
+Create the environment:
 
+```bash
 python3 -m venv venv
 source venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
 pip install -r requirements.txt
+```
 
-Start the API:
+Run the FastAPI server:
 
+```bash
 uvicorn main:app --host 0.0.0.0 --port 8000
+```
 
-The Raspberry Pi can then receive requests from another device on the
-same network.
+The Raspberry Pi can now receive prediction requests from the frontend/backend over the network.
 
-Health Check
+---
 
-A health endpoint can be used to verify that the backend is running:
+# 🌐 Frontend → Backend → Raspberry Pi
 
-curl http://<RASPBERRY_PI_IP>:8000/health
+The complete communication flow is:
 
-Example:
+```text
+          USER
+           │
+           ▼
+      WEB FRONTEND
+           │
+           │ HTTP Request
+           ▼
+      FASTAPI BACKEND
+           │
+           │ Prediction Request
+           ▼
+      RASPBERRY PI
+           │
+           ▼
+       ML MODEL
+      GRU / LSTM
+           │
+           ▼
+      PREDICTION
+           │
+           ▼
+      FASTAPI RESPONSE
+           │
+           ▼
+      WEB FRONTEND
+           │
+           ▼
+    VISUALIZATION
+```
 
-{
-  "status": "online",
-  "device": "Raspberry Pi"
-}
+---
 
-Why Edge AI?
+# 💡 Innovation
 
-Deploying the model on Raspberry Pi provides:
-
-Local inference
-
-Low communication overhead
-
-Reduced dependence on cloud infrastructure
-
-Lightweight deployment
-
-Potentially faster response for local applications
-
-A practical path toward field or onboard deployment
-
-Innovation
-
-The core idea is not simply using an LSTM or GRU.
+The innovation of the project is not simply using a GRU or LSTM.
 
 The proposed solution combines:
 
-Temporal satellite-error modelling
+* Temporal satellite-error modelling
+* Multi-dimensional error prediction
+* Orbital feature engineering
+* Temporal feature engineering
+* Chronological forecasting validation
+* GRU and LSTM comparison
+* ONNX conversion
+* INT8 optimization
+* Raspberry Pi edge deployment
+* FastAPI-based inference
+* Web-based visualization
+* Automated prediction evaluation
 
-Multi-dimensional error prediction
+The result is an **end-to-end predictive satellite error forecasting pipeline**.
 
-Orbital and temporal feature engineering
+---
 
-Chronological forecasting validation
+# 🌍 Applications
 
-ONNX model optimization
+The proposed system can support applications such as:
 
-INT8 edge inference
+* GNSS positioning
+* Navigation systems
+* Satellite-based positioning
+* Autonomous systems
+* Precision navigation
+* GNSS monitoring
+* Satellite operations
+* Real-time positioning systems
+* Edge-based navigation applications
 
-Raspberry Pi deployment
+---
 
-FastAPI-based prediction service
+# 🔮 Future Scope
 
-Web-based visualization and evaluation
+Future improvements can include:
 
-The complete pipeline moves from raw/reference GNSS information to an
-actionable future error prediction.
+* Longer prediction horizons
+* Real-time GNSS data ingestion
+* Support for multiple GNSS constellations
+* Automated model retraining
+* Additional orbital dynamics features
+* Improved quantization techniques
+* Model pruning
+* Real-time error alerts
+* Multi-Raspberry-Pi deployment
+* Integration with real-time navigation systems
+* Continuous performance monitoring
 
-Future Scope
+---
 
-Possible future improvements include:
+# 🏆 Key Takeaway
 
-Longer forecasting horizons
+Traditional systems primarily **detect and correct** satellite errors.
 
-More GNSS constellations
+Our system aims to:
 
-Larger and more diverse datasets
+```text
+DETECT
+   ↓
+UNDERSTAND
+   ↓
+FORECAST
+   ↓
+ACT EARLY
+```
 
-Additional satellite dynamics features
+> **Don't wait for satellite error. Forecast it.**
 
-Automated model retraining
+---
 
-Model quantization and pruning improvements
+# 👥 Team
 
-Real-time GNSS data ingestion
+### The Overfitters
 
-Multi-device edge deployment
+**Smart India Hackathon 2026**
 
-Integration with navigation and positioning systems
+**Domain:** Space Technology
 
-Automated alerts when predicted error exceeds a threshold
+---
 
-Team
+## 📜 Disclaimer
 
-The Overfitters
-SIH 2026 --- Space Technology
+This project is a prototype developed for **Smart India Hackathon 2026**.
 
-Disclaimer
-
-This repository is a prototype developed for the Smart India Hackathon
-(SIH) 2026. Prediction performance depends on the quality, coverage, and
-temporal characteristics of the GNSS/reference data used for training
-and evaluation.
+Prediction performance depends on the quality, quantity and temporal characteristics of the GNSS data used for training and evaluation.
