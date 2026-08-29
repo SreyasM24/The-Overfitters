@@ -41,11 +41,17 @@ export function getMockPrediction(timeString) {
 
   return {
     timestamp,
-    x_error: parseFloat(((seededRandom(1) - 0.5) * 0.01).toFixed(4)),
-    y_error: parseFloat(((seededRandom(2) - 0.5) * 0.01).toFixed(4)),
-    z_error: parseFloat(((seededRandom(3) - 0.5) * 0.005).toFixed(4)),
-    satellite_clock_error: parseFloat(
-      (seededRandom(4) * 5e-9).toExponential(1)
-    ),
+    lstm: {
+      x_error: parseFloat(((seededRandom(1) - 0.5) * 0.01).toFixed(4)),
+      y_error: parseFloat(((seededRandom(2) - 0.5) * 0.01).toFixed(4)),
+      z_error: parseFloat(((seededRandom(3) - 0.5) * 0.005).toFixed(4)),
+      clock_error: parseFloat((seededRandom(4) * 5e-9).toExponential(1)),
+    },
+    gru: {
+      x_error: parseFloat(((seededRandom(5) - 0.5) * 0.008).toFixed(4)),
+      y_error: parseFloat(((seededRandom(6) - 0.5) * 0.009).toFixed(4)),
+      z_error: parseFloat(((seededRandom(7) - 0.5) * 0.004).toFixed(4)),
+      clock_error: parseFloat((seededRandom(8) * 4e-9).toExponential(1)),
+    }
   };
 }

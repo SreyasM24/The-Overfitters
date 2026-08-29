@@ -1,186 +1,150 @@
 import { motion, AnimatePresence } from 'framer-motion';
 
-/* ═════════════════════════════════════════════
-   Field definitions for the telemetry readout
-   ═════════════════════════════════════════════ */
-function formatFields(prediction) {
-  if (!prediction) return [];
-  return [
-    {
-      label: 'TIMESTAMP',
-      value: prediction.timestamp,
-      unit: '',
-    },
-    {
-      label: 'X_ERROR',
-      value: prediction.x_error >= 0
-        ? `+${prediction.x_error.toFixed(4)}`
-        : prediction.x_error.toFixed(4),
-      unit: 'm',
-    },
-    {
-      label: 'Y_ERROR',
-      value: prediction.y_error >= 0
-        ? `+${prediction.y_error.toFixed(4)}`
-        : prediction.y_error.toFixed(4),
-      unit: 'm',
-    },
-    {
-      label: 'Z_ERROR',
-      value: prediction.z_error >= 0
-        ? `+${prediction.z_error.toFixed(4)}`
-        : prediction.z_error.toFixed(4),
-      unit: 'm',
-    },
-    {
-      label: 'SAT CLOCK ERR',
-      value: prediction.satellite_clock_error.toExponential(1),
-      unit: 's',
-    },
-  ];
-}
-
-/* ═════════════════════════════════════════════
-   StatusBar component
-   ═════════════════════════════════════════════ */
 export default function StatusBar({ prediction, isLoading }) {
-  const fields = formatFields(prediction);
-
   return (
     <motion.div
-      key="statusbar"
-      initial={{ x: -20, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        bottom: 0,
-        width: '560px',
+        left: '40px',
+        top: '40px', 
         zIndex: 100,
-        padding: '60px 40px 40px 40px',
+        pointerEvents: 'none',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        fontFamily: "'JetBrains Mono', monospace",
-        pointerEvents: 'none',
+        gap: '40px', // Increased gap between heading and table
+        width: '580px', // Increased table container width significantly
       }}
     >
-      {/* ── Title block ──────────────────────────── */}
-      <div style={{ marginBottom: '60px' }}>
+      {/* ── Title block ── */}
+      <div>
         <h1
           style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: '22px',
+            fontSize: '42px', // Increased from 28px
             fontWeight: 700,
-            color: 'rgba(200, 230, 255, 0.9)',
-            letterSpacing: '8px',
-            textTransform: 'uppercase',
+            color: '#fff',
             margin: 0,
+            lineHeight: 1.2,
+            textShadow: '0 0 15px rgba(0, 150, 255, 0.6)',
           }}
         >
-          Satellite Error Predictor
+          SATELLITE ERROR PREDICTOR
         </h1>
         <div
           style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '9px',
-            color: 'rgba(100, 160, 255, 0.35)',
-            letterSpacing: '3px',
-            marginTop: '6px',
+            fontFamily: "'Inter', sans-serif",
+            fontSize: '13px', // Increased from 11px
+            color: '#00c8ff',
+            letterSpacing: '4px',
+            marginTop: '12px',
           }}
         >
-          ISRO • GEO/MEO ORBIT ANALYSIS
+          NAVIC • EPHEMERIS & CLOCK ERROR ANALYSIS
         </div>
       </div>
 
-      {/* ── Data Area ────────────────────────────── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-        <AnimatePresence>
-          {/* Loading state */}
-          {isLoading && !prediction && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{
-                repeat: Infinity,
-                duration: 1.5,
-                ease: 'easeInOut',
-              }}
-              style={{
-                color: 'rgba(0, 200, 255, 0.7)',
-                fontSize: '13px',
-                letterSpacing: '2px',
-              }}
-            >
-              ◈ Analyzing satellite telemetry…
-            </motion.div>
-          )}
+      {/* Loading state */}
+      {isLoading && !prediction && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+          style={{
+            color: 'rgba(0, 200, 255, 0.7)',
+            fontSize: '18px',
+            letterSpacing: '2px',
+            fontFamily: "'JetBrains Mono', monospace",
+          }}
+        >
+          ◈ Analyzing satellite telemetry…
+        </motion.div>
+      )}
 
-          {/* Data fields */}
-          {fields.map((field, i) => (
-            <motion.div
-              key={field.label}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: i * 0.08,
-                type: 'spring',
-                stiffness: 250,
-                damping: 20,
-              }}
-              style={{
-                textAlign: 'left',
-              }}
-            >
-              {/* Label */}
-              <div
-                style={{
-                  fontFamily: "'Orbitron', sans-serif",
-                  fontSize: '12px',
-                  fontWeight: 500,
-                  color: 'rgba(0, 200, 255, 0.55)',
-                  letterSpacing: '3px',
-                  marginBottom: '8px',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {field.label}
-              </div>
+      {/* ── Comparison Table ── */}
+      {prediction && !isLoading && (
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1.2fr 1fr 1fr',
+            gap: '28px 16px', // Increased gap between rows and columns
+            background: 'rgba(5, 15, 30, 0.5)',
+            border: '1px solid rgba(0, 150, 255, 0.2)',
+            borderRadius: '16px',
+            padding: '36px', // Increased inner padding
+            backdropFilter: 'blur(12px)',
+          }}
+        >
+          {/* Headers */}
+          <div style={headerStyle}>METRIC</div>
+          <div style={headerStyle}>LSTM</div>
+          <div style={headerStyle}>GRU</div>
 
-              {/* Value */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.08 + 0.15 }}
-                style={{
-                  fontFamily: "'Space Mono', monospace",
-                  fontSize: '18px',
-                  fontWeight: 600,
-                  color: '#dceeff',
-                  textShadow: '0 0 8px rgba(0, 150, 255, 0.2)',
-                }}
-              >
-                {field.value}
-                {field.unit && (
-                  <span
-                    style={{
-                      fontFamily: "'Orbitron', sans-serif",
-                      fontSize: '13px',
-                      color: 'rgba(150, 200, 255, 0.45)',
-                      marginLeft: '6px',
-                    }}
-                  >
-                    {field.unit}
-                  </span>
-                )}
-              </motion.div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+          {/* X Error */}
+          <div style={labelStyle}>X ERROR</div>
+          <div style={valueStyle}>{formatNum(prediction.lstm?.x_error)}<span style={unitStyle}>m</span></div>
+          <div style={valueStyle}>{formatNum(prediction.gru?.x_error)}<span style={unitStyle}>m</span></div>
+
+          {/* Y Error */}
+          <div style={labelStyle}>Y ERROR</div>
+          <div style={valueStyle}>{formatNum(prediction.lstm?.y_error)}<span style={unitStyle}>m</span></div>
+          <div style={valueStyle}>{formatNum(prediction.gru?.y_error)}<span style={unitStyle}>m</span></div>
+
+          {/* Z Error */}
+          <div style={labelStyle}>Z ERROR</div>
+          <div style={valueStyle}>{formatNum(prediction.lstm?.z_error)}<span style={unitStyle}>m</span></div>
+          <div style={valueStyle}>{formatNum(prediction.gru?.z_error)}<span style={unitStyle}>m</span></div>
+
+          {/* Clock Error */}
+          <div style={labelStyle}>CLOCK ERR</div>
+          <div style={valueStyle}>{prediction.lstm?.clock_error}<span style={unitStyle}>s</span></div>
+          <div style={valueStyle}>{prediction.gru?.clock_error}<span style={unitStyle}>s</span></div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }
+
+// ── Helper styles and formatting ──
+
+function formatNum(val) {
+  if (val === undefined || val === null) return '--';
+  return val >= 0 ? `+${val.toFixed(4)}` : val.toFixed(4);
+}
+
+const headerStyle = {
+  fontFamily: "'Orbitron', sans-serif",
+  fontSize: '15px', // Increased from 12px
+  color: 'rgba(100, 200, 255, 0.5)',
+  letterSpacing: '2px',
+  borderBottom: '1px solid rgba(0, 150, 255, 0.2)',
+  paddingBottom: '14px',
+  marginBottom: '8px',
+};
+
+const labelStyle = {
+  fontFamily: "'Orbitron', sans-serif",
+  fontSize: '17px', // Increased from 14px
+  color: '#009dff',
+  letterSpacing: '1px',
+  display: 'flex',
+  alignItems: 'center',
+};
+
+const valueStyle = {
+  fontFamily: "'Space Mono', monospace",
+  fontSize: '25px', // Increased from 18px
+  color: '#ffffff',
+  fontWeight: 'bold',
+  textShadow: '0 0 8px rgba(255,255,255,0.4)',
+};
+
+const unitStyle = {
+  fontSize: '14px', // Increased from 12px
+  color: '#556677',
+  marginLeft: '8px',
+};
