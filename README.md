@@ -16,7 +16,7 @@ The system predicts four major error components:
 * Z-axis Position Error
 * Satellite Clock Error
 
-The trained models are optimized and deployed on a **Raspberry Pi**, enabling lightweight **edge-based inference**.
+The trained **GRU and LSTM models run locally** and are accessed through a **FastAPI backend**, providing a lightweight and efficient prediction pipeline.
 
 ---
 
@@ -29,9 +29,7 @@ The trained models are optimized and deployed on a **Raspberry Pi**, enabling li
 * Multi-output prediction of X, Y, Z and clock errors
 * GRU and LSTM model comparison
 * Chronological time-series validation
-* ONNX model conversion
-* INT8 model optimization
-* Raspberry Pi edge deployment
+* Local model inference
 * FastAPI-based backend
 * Web-based visualization dashboard
 * MAE and RMSE based evaluation
@@ -71,9 +69,7 @@ Feature Engineering
         ↓
   2-Hour Error Forecast
         ↓
-     ONNX / INT8
-        ↓
-    Raspberry Pi
+   Local Inference
         ↓
       FastAPI
         ↓
@@ -160,7 +156,7 @@ Similar temporal and statistical features are generated for the other prediction
 
 # Model Architecture
 
-We evaluated two recurrent neural network architectures:
+We evaluate two recurrent neural network architectures:
 
 ## GRU — Gated Recurrent Unit
 
@@ -168,15 +164,13 @@ GRU is a recurrent neural network designed for sequential data.
 
 It is relatively lightweight while still being capable of learning temporal dependencies.
 
-This makes GRU particularly suitable for **edge deployment on resource-constrained devices such as Raspberry Pi**.
-
 ---
 
 ## LSTM — Long Short-Term Memory
 
-LSTM is another recurrent neural network architecture designed to learn long-term dependencies in sequential data.
+LSTM is a recurrent neural network architecture designed to learn long-term dependencies in sequential data.
 
-It was used as a comparison model against GRU.
+It is used as a comparison model against GRU.
 
 ---
 
@@ -214,8 +208,6 @@ The prepared dataset contains approximately:
 | Prediction Targets |       4 |
 | Forecast Horizon   | 2 Hours |
 
-The system can work with GNSS observations, broadcast navigation/ephemeris information, satellite clock information and precise reference products.
-
 ---
 
 # Time-Series Validation
@@ -238,53 +230,25 @@ This better represents the real-world forecasting scenario where the model only 
 
 ---
 
-# Edge Deployment
+# Local Model Inference
 
-After training, the models are exported to **ONNX** format.
+The trained **GRU and LSTM models run locally** as part of the prediction system.
 
-The models are then optimized using **INT8 quantization** for lightweight inference.
-
-Example model files:
+The local inference process is:
 
 ```text
-models/
-├── GRU_FP32.onnx
-├── GRU_INT8.onnx
-├── LSTM_FP32.onnx
-└── LSTM_INT8.onnx
-```
-
-The INT8 models are designed for efficient inference on the Raspberry Pi.
-
----
-
-# Raspberry Pi Deployment
-
-The Raspberry Pi acts as the **edge inference device**.
-
-The complete process is:
-
-```text
-Frontend
-    ↓
-FastAPI Request
-    ↓
-Raspberry Pi
-    ↓
 Historical Sequence
-    ↓
-ONNX Runtime
-    ↓
+        ↓
+Load Model
+        ↓
 GRU / LSTM
-    ↓
+        ↓
 Prediction
-    ↓
-FastAPI Response
-    ↓
-Frontend
+        ↓
+X / Y / Z / Clock Error
 ```
 
-This means the ML model does not need to run on a powerful cloud GPU for every prediction.
+Running inference locally reduces the dependency on external cloud-based model execution and allows the prediction pipeline to operate within the local system.
 
 ---
 
@@ -292,16 +256,40 @@ This means the ML model does not need to run on a powerful cloud GPU for every p
 
 The backend is implemented using **FastAPI**.
 
+FastAPI acts as the communication layer between the web application and the locally running machine-learning models.
+
 The backend is responsible for:
 
 1. Receiving prediction requests.
 2. Identifying the requested satellite and prediction time.
 3. Preparing the required historical sequence.
-4. Loading the deployed model.
-5. Running inference on the Raspberry Pi.
+4. Loading the GRU or LSTM model.
+5. Running local inference.
 6. Returning X, Y, Z and clock predictions.
 7. Comparing GRU and LSTM predictions when required.
 8. Providing evaluation metrics when ground truth is available.
+
+---
+
+# API Workflow
+
+```text
+Web Frontend
+      ↓
+HTTP Request
+      ↓
+FastAPI Backend
+      ↓
+Local GRU / LSTM Model
+      ↓
+Prediction
+      ↓
+FastAPI Response
+      ↓
+Web Frontend
+      ↓
+Visualization
+```
 
 ---
 
@@ -310,18 +298,10 @@ The backend is responsible for:
 Example prediction request:
 
 ```bash
-curl -X POST http://<RASPBERRY_PI_IP>:8000/compare \
+curl -X POST http://localhost:8000/compare \
 -H "Content-Type: application/json" \
 -d '{"satellite":7,"prediction_date":"2025-04-30","prediction_time":"00:00"}'
 ```
-
-Replace:
-
-```text
-<RASPBERRY_PI_IP>
-```
-
-with the IP address of your Raspberry Pi.
 
 ---
 
@@ -331,13 +311,13 @@ The API can return predictions from both models:
 
 ```json
 {
-  "GRU_INT8": {
+  "GRU": {
     "X_error": 0.0,
     "Y_error": 0.0,
     "Z_error": 0.0,
     "Clock_error": 0.0
   },
-  "LSTM_INT8": {
+  "LSTM": {
     "X_error": 0.0,
     "Y_error": 0.0,
     "Z_error": 0.0,
@@ -347,34 +327,13 @@ The API can return predictions from both models:
 }
 ```
 
-The exact response structure depends on the implementation of the deployed FastAPI service.
-
----
-
-# Health Check
-
-The backend can expose a health endpoint to verify that the Raspberry Pi server is running.
-
-```bash
-curl http://<RASPBERRY_PI_IP>:8000/health
-```
-
-Example response:
-
-```json
-{
-  "status": "online",
-  "device": "Raspberry Pi"
-}
-```
+The exact response structure depends on the implementation of the FastAPI service.
 
 ---
 
 # Model Evaluation
 
 When actual observations are available, predicted values are compared with ground-truth values.
-
-Two important evaluation metrics are used.
 
 ## MAE — Mean Absolute Error
 
@@ -402,8 +361,6 @@ Lower RMSE indicates better performance.
 
 # Project Structure
 
-A typical project structure is:
-
 ```text
 GNSS-Satellite-Error-Prediction/
 │
@@ -415,10 +372,8 @@ GNSS-Satellite-Error-Prediction/
 │   └── ...
 │
 ├── models/
-│   ├── GRU_FP32.onnx
-│   ├── GRU_INT8.onnx
-│   ├── LSTM_FP32.onnx
-│   └── LSTM_INT8.onnx
+│   ├── GRU/
+│   └── LSTM/
 │
 ├── data/
 │   └── ...
@@ -439,25 +394,25 @@ git clone <YOUR_GITHUB_REPOSITORY_URL>
 cd <YOUR_PROJECT_DIRECTORY>
 ```
 
----
-
 ## 2. Create Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+Activate the environment.
 
 ### Windows
 
 ```bash
-python -m venv venv
 venv\Scripts\activate
 ```
 
-### Linux / Raspberry Pi
+### Linux / macOS
 
 ```bash
-python3 -m venv venv
 source venv/bin/activate
 ```
-
----
 
 ## 3. Install Dependencies
 
@@ -522,75 +477,6 @@ The frontend communicates with the FastAPI backend and displays:
 
 ---
 
-# Raspberry Pi Setup
-
-On the Raspberry Pi:
-
-```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd <YOUR_PROJECT_DIRECTORY>
-```
-
-Create the environment:
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Run the FastAPI server:
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
-The Raspberry Pi can now receive prediction requests from the frontend/backend over the network.
-
----
-
-# Frontend to Backend to Raspberry Pi
-
-The complete communication flow is:
-
-```text
-          USER
-           │
-           ▼
-      WEB FRONTEND
-           │
-           │ HTTP Request
-           ▼
-      FASTAPI BACKEND
-           │
-           │ Prediction Request
-           ▼
-      RASPBERRY PI
-           │
-           ▼
-       ML MODEL
-      GRU / LSTM
-           │
-           ▼
-      PREDICTION
-           │
-           ▼
-      FASTAPI RESPONSE
-           │
-           ▼
-      WEB FRONTEND
-           │
-           ▼
-    VISUALIZATION
-```
-
----
-
 # Innovation
 
 The innovation of the project is not simply using a GRU or LSTM.
@@ -603,10 +489,8 @@ The proposed solution combines:
 * Temporal feature engineering
 * Chronological forecasting validation
 * GRU and LSTM comparison
-* ONNX conversion
-* INT8 optimization
-* Raspberry Pi edge deployment
-* FastAPI-based inference
+* Local model inference
+* FastAPI-based prediction service
 * Web-based visualization
 * Automated prediction evaluation
 
@@ -639,10 +523,8 @@ Future improvements can include:
 * Support for multiple GNSS constellations
 * Automated model retraining
 * Additional orbital dynamics features
-* Improved quantization techniques
-* Model pruning
+* Model optimization
 * Real-time error alerts
-* Multi-Raspberry-Pi deployment
 * Integration with real-time navigation systems
 * Continuous performance monitoring
 
