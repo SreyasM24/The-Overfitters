@@ -14,8 +14,8 @@ export default function StatusBar({ prediction, isLoading }) {
         pointerEvents: 'none',
         display: 'flex',
         flexDirection: 'column',
-        gap: '40px', // Increased gap between heading and table
-        width: '480px', 
+        gap: '32px', // Decreased from 40px
+        width: '430px', // Decreased from 480px
       }}
     >
       {/* ── Title block ── */}
@@ -23,12 +23,12 @@ export default function StatusBar({ prediction, isLoading }) {
         <h1
           style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: '42px', // Increased from 28px
+            fontSize: '34px', // Decreased from 42px
             fontWeight: 700,
             color: '#fff',
             margin: 0,
             lineHeight: 1.2,
-            textShadow: '0 0 15px rgba(0, 150, 255, 0.6)',
+            textShadow: '0 0 12px rgba(0, 150, 255, 0.5)',
           }}
         >
           SATELLITE ERROR PREDICTOR
@@ -36,10 +36,10 @@ export default function StatusBar({ prediction, isLoading }) {
         <div
           style={{
             fontFamily: "'Inter', sans-serif",
-            fontSize: '13px', // Increased from 11px
+            fontSize: '11px', // Decreased from 13px
             color: '#00c8ff',
             letterSpacing: '4px',
-            marginTop: '12px',
+            marginTop: '10px',
           }}
         >
           NAVIC • EPHEMERIS & CLOCK ERROR ANALYSIS
@@ -54,7 +54,7 @@ export default function StatusBar({ prediction, isLoading }) {
           transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
           style={{
             color: 'rgba(0, 200, 255, 0.7)',
-            fontSize: '18px',
+            fontSize: '16px', // Decreased from 18px
             letterSpacing: '2px',
             fontFamily: "'JetBrains Mono', monospace",
           }}
@@ -71,9 +71,8 @@ export default function StatusBar({ prediction, isLoading }) {
           style={{
             display: 'grid',
             gridTemplateColumns: '1.2fr 1fr 1fr',
-            gap: '28px 16px', // Keep the wide spacing
-            width: '480px', // Reduced from 580px so it doesn't hit the globe
-            // Background, border, and blur completely removed to let it float in space
+            gap: '22px 14px', // Decreased from 28px 16px
+            width: '430px', 
           }}
         >
           {/* Headers */}
@@ -115,17 +114,17 @@ function formatNum(val) {
 
 const headerStyle = {
   fontFamily: "'Orbitron', sans-serif",
-  fontSize: '15px', // Increased from 12px
+  fontSize: '12px', // Decreased from 15px
   color: 'rgba(100, 200, 255, 0.5)',
-  letterSpacing: '2px',
+  letterSpacing: '1.5px',
   borderBottom: '1px solid rgba(0, 150, 255, 0.2)',
-  paddingBottom: '14px',
-  marginBottom: '8px',
+  paddingBottom: '10px', // Decreased from 14px
+  marginBottom: '6px', // Decreased from 8px
 };
 
 const labelStyle = {
   fontFamily: "'Orbitron', sans-serif",
-  fontSize: '17px', // Increased from 14px
+  fontSize: '14px', // Decreased from 17px
   color: '#009dff',
   letterSpacing: '1px',
   display: 'flex',
@@ -134,14 +133,14 @@ const labelStyle = {
 
 const valueStyle = {
   fontFamily: "'Space Mono', monospace",
-  fontSize: '25px', // Increased from 18px
+  fontSize: '20px', // Decreased from 25px
   color: '#ffffff',
   fontWeight: 'bold',
-  textShadow: '0 0 8px rgba(255,255,255,0.4)',
+  textShadow: '0 0 6px rgba(255,255,255,0.3)',
 };
 
 const unitStyle = {
-  fontSize: '14px', // Increased from 12px
+  fontSize: '11px', // Decreased from 14px
   color: '#556677',
-  marginLeft: '8px',
+  marginLeft: '6px',
 };
